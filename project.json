@@ -1,0 +1,26 @@
+{
+    "project_type": "javascript",
+
+    "debugMode" : 1,
+    "showFPS" : false,
+    "frameRate" : 60,
+    "id" : "gameCanvas",
+    "renderMode" : 0,
+    "engineDir":"frameworks/cocos2d-html5",
+
+    "modules" : ["cocos2d"],
+
+    "jsList" : [
+        "src/resource.js",
+        "src/SoundEffects.js",
+        "src/FighterPhysics.js",
+        "src/Projectile.js",
+        "src/ProjectileImpact.js",
+        "src/Fighter.js",
+        "src/BackgroundLayer.js",
+        "src/StatusLayer.js",
+        "src/AnimationLayer.js",
+        "src/PlayScene.js",
+        "src/app.js"
+    ]
+}
