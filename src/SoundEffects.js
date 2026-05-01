@@ -4,7 +4,7 @@
  * Hadoken always plays regardless of mute state.
  */
 var SoundEffects = {
-    enabled: false,       // MUTED by default
+    enabled: true,
     musicPlaying: false,
     volume: 0.7,
     musicVolume: 0.35,

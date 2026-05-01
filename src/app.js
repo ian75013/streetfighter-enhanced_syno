@@ -1,7 +1,7 @@
 /**
  * TITLE SCREEN - Generated Street Fighter style
  * Features: animated title, character preview sprites, blinking "PRESS START"
- * Sound is MUTED by default - press M to toggle
+ * Sound is enabled by default - press M to toggle
  */
 
 var TitleBackgroundLayer = cc.Layer.extend({
