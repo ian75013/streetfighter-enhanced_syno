@@ -1,0 +1,165 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    urlcolor=blue!70!black,
+    citecolor=blue!70!black
+}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{doctum}{rgb}{0.10,0.30,0.60}
+
+\lstset{
+  backgroundcolor=\color{codegray},
+  basicstyle=\small\ttfamily,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{gray!40},
+  xleftmargin=1em,
+  framexleftmargin=0.5em
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{doctum}{\small\textbf{Doctum Consilium}}}
+\fancyhead[R]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+
+\titleformat{\section}{\large\bfseries\color{doctum}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{doctum!80}}{}{0em}{}
+
+
+\begin{document}
+
+\title{
+  \textcolor{doctum}{\Large\textbf{Street Fighter Enhanced (Synology)}} \\[0.5em]
+  \large Browser-Based Street Fighter Game — Cocos2d-HTML5 \\[0.3em]
+  \normalsize Technical Foundations and Architecture
+}
+\author{Doctum Consilium \\ \small\textit{Generated 2026-05-08}}
+\date{}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+Enhanced browser port of a Street Fighter game built with Cocos2d-HTML5 framework, featuring sprite animation, physics, and Synology NAS deployment.
+This document covers the theoretical foundations, architectural decisions,
+and key technical concepts required to understand, contribute to, and
+maintain this repository.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Overview}
+
+A browser-based 2D fighting game implemented with Cocos2d-HTML5 v3.
+The game features sprite-sheet animation, collision detection, physics
+simulation, and a multi-layer canvas rendering architecture.
+It is containerised with Docker and served as a static web application.
+
+
+\section{Architecture}
+
+\begin{verbatim}
+Browser (Canvas2D / WebGL)
+└── Cocos2d-HTML5 runtime
+    ├── Scene graph (Layer tree)
+    │   ├── BackgroundLayer
+    │   ├── AnimationLayer (fighters)
+    │   └── StatusLayer (health bars)
+    ├── Fighter.js      (state machine)
+    ├── FighterPhysics.js (gravity, collision)
+    └── Projectile.js   (hadouken physics)
+\end{verbatim}
+
+
+\section{Key Technical Concepts}
+\begin{itemize}[leftmargin=1.5em]
+  \item Sprite sheet animation: texture atlas (plist) maps named frames to UV coordinates; \texttt{cc.AnimationCache} manages frame sequences.
+  \item Scene graph: hierarchical node tree; each node has position, scale, rotation, opacity; parent transforms propagate to children.
+  \item Finite state machine (FSM): fighter states (idle, walking, jumping, attacking, stunned, KO); transitions triggered by input or collision events.
+  \item AABB collision detection: axis-aligned bounding box overlap; $\text{overlap} = \text{rect}_A.\text{intersects}(\text{rect}_B)$.
+  \item Game loop: \texttt{cc.scheduler} drives \texttt{update(dt)} at 60~fps; delta-time normalised physics for frame-rate independence.
+\end{itemize}
+
+\section{Data Flow}
+
+Input event (keyboard/touch) →
+Fighter FSM transition →
+Physics update (gravity, velocity integration) →
+Collision detection →
+Animation frame selection →
+Canvas render.
+
+
+\section{Technology Stack}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Component} & \textbf{Technology} \\
+\midrule
+Game framework & Cocos2d-HTML5 v3 \\
+Rendering & Canvas2D / WebGL \\
+Asset format & PNG sprite sheets + plist atlases \\
+Server & nginx (Docker) \\
+\bottomrule
+\end{tabular}
+
+
+\section{Design Decisions}
+
+\begin{itemize}
+  \item Cocos2d-HTML5 chosen for its mature sprite/animation API
+    and cross-browser Canvas/WebGL abstraction.
+  \item Static file serving via nginx: no backend required,
+    minimal operational overhead on Synology NAS.
+\end{itemize}
+
+
+\section{Repository Structure}
+\begin{lstlisting}[language=bash,caption={Top-level directory layout}]
+streetfighter-enhanced_syno/
+  .github/
+    copilot-instructions.md   # GitHub Copilot guardrails
+    agents/
+      ecr-secrets-agent.agent.md  # ECR secret rotation runbook
+  CLAUDE.md                   # Claude Code guardrails
+  GEMINI.md                   # Gemini CLI guardrails
+  INFRASTRUCTURE.md           # Operational runbook
+  ROADMAP.md                  # Execution log and roadmap
+  README.md                   # Project overview
+\end{lstlisting}
+
+\section{Contributing}
+\begin{enumerate}
+  \item Read \texttt{README.md}, \texttt{INFRASTRUCTURE.md}, and \texttt{ROADMAP.md} before any task.
+  \item Follow the Code Documentation Standard: every public function must have
+    a docstring (Google-style for Python, JSDoc for TypeScript, XML for C\#).
+  \item Run the guardrails validator before committing:
+    \begin{lstlisting}[language=bash]
+git add -A && ./.guardrails/bin/validate_guardrails.sh
+    \end{lstlisting}
+  \item For deployment or destructive operations, always use a named tmux session:
+    \begin{lstlisting}[language=bash]
+tmux new-session -A -s deploy-streetfighter-enhanced_syno
+    \end{lstlisting}
+\end{enumerate}
+
+\end{document}

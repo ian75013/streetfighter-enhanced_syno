@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sprite Mapper</title>
+    <style>
+        body { font-family: sans-serif; background: #222; color: white; display: flex; }
+        .panel { padding: 20px; flex: 1; }
+        .sprite-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+        .sprite-box { background: #333; padding: 5px; text-align: center; border: 2px solid transparent; cursor: pointer; }
+        .sprite-box:hover { border-color: #555; }
+        .sprite-box.selected { border-color: #0f0; }
+        .sprite-img { max-width: 100%; max-height: 80px; object-fit: contain; }
+        
+        #mapping-panel { flex: 0 0 300px; background: #111; overflow-y: auto; height: 100vh; position: sticky; top: 0; }
+        .map-slot { background: #222; margin-bottom: 5px; padding: 10px; border-left: 5px solid #555; cursor: pointer;}
+        .map-slot.active { border-left-color: #0f0; background: #333; }
+        .map-slot img { max-height: 40px; vertical-align: middle; margin-left: 10px;}
+        
+        .controls { position: sticky; top: 0; background: #111; padding: 10px; z-index: 100; border-bottom: 1px solid #333;}
+    </style>
+</head>
+<body>
+    <div id="mapping-panel">
+        <div class="controls">
+            <select id="character-select">
+                <option value="ken">Ken</option>
+                <option value="akuma">Akuma</option>
+            </select>
+            <button onclick="generateJSON()">Generate JSON</button>
+            <p>Select a slot below, then click a sprite to assign it.</p>
+        </div>
+        <div id="slots"></div>
+    </div>
+    <div class="panel">
+        <h2>Raw Sprites</h2>
+        <div class="sprite-grid" id="raw-sprites"></div>
+    </div>
+
+    <script>
+        const stateMapping = {
+            "stand": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "moveLeft_moveRight": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            "hadoken": [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+            "crouch": [33, 34, 35, 36, 37, 38],
+            "jump": [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48]
+        };
+
+        const totalRaw = { "ken": 171, "akuma": 182 };
+        let currentCharacter = "ken";
+        let activeSlotIndex = 1;
+        let mapping = { ken: {}, akuma: {} };
+
+        function initSlots() {
+            const slotsDiv = document.getElementById("slots");
+            slotsDiv.innerHTML = "";
+            
+            for (let i = 1; i <= 50; i++) {
+                let context = "";
+                for(let key in stateMapping) {
+                    if (stateMapping[key].includes(i)) {
+                        context += key + " ";
+                    }
+                }
+                
+                const div = document.createElement("div");
+                div.className = `map-slot ${i === activeSlotIndex ? 'active' : ''}`;
+                div.innerHTML = `<strong>Frame ${i}</strong> <small>${context}</small> <img id="slot-img-${i}">`;
+                div.onclick = () => setActiveSlot(i);
+                slotsDiv.appendChild(div);
+                
+                if (mapping[currentCharacter][i]) {
+                    document.getElementById(`slot-img-${i}`).src = getSpritePath(mapping[currentCharacter][i]);
+                }
+            }
+        }
+
+        function getSpritePath(index) {
+            const prefix = currentCharacter === 'ken' ? 'KenRaw/ken' : 'AkumaRaw/akuma';
+            const padded = String(index).padStart(3, '0');
+            return `res/${prefix}_${padded}.png`;
+        }
+
+        function loadRawSprites() {
+            const grid = document.getElementById("raw-sprites");
+            grid.innerHTML = "";
+            const count = totalRaw[currentCharacter];
+            
+            for (let i = 1; i <= count; i++) {
+                const div = document.createElement("div");
+                div.className = "sprite-box";
+                div.innerHTML = `<img src="${getSpritePath(i)}" class="sprite-img"><br><small>${i}</small>`;
+                div.onclick = () => assignSprite(i);
+                grid.appendChild(div);
+            }
+        }
+
+        function setActiveSlot(index) {
+            activeSlotIndex = index;
+            initSlots();
+        }
+
+        function assignSprite(spriteIndex) {
+            mapping[currentCharacter][activeSlotIndex] = spriteIndex;
+            document.getElementById(`slot-img-${activeSlotIndex}`).src = getSpritePath(spriteIndex);
+            if (activeSlotIndex < 50) setActiveSlot(activeSlotIndex + 1);
+        }
+
+        document.getElementById("character-select").onchange = (e) => {
+            currentCharacter = e.target.value;
+            activeSlotIndex = 1;
+            initSlots();
+            loadRawSprites();
+        };
+
+        function generateJSON() {
+            const json = JSON.stringify(mapping, null, 2);
+            const blob = new Blob([json], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "mapping.json";
+            a.click();
+        }
+
+        initSlots();
+        loadRawSprites();
+    </script>
+</body>
+</html>

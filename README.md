@@ -100,3 +100,7 @@ Si aucune ne fonctionne, il faut installer Python et l'ajouter au PATH.
 ## Etat du projet
 
 Le projet est une base Cocos2d-JS orientee prototype. Le README a ete mis a jour pour permettre un lancement local rapide et reproductible.
+## How This Project Works (Operations)
+- Runtime and infra details are documented in [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
+- Start from the local run section, then use the deployment section for production updates.
+- Keep changes reversible and validate health checks after rollout.
