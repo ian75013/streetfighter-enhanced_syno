@@ -34,3 +34,23 @@ build/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+
+
+# === Cleanup additions 2026-06-06 ===
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+
+
+# Claude Code local settings (per-user, never commit)
+.claude/settings.local.json
+
+# === End cleanup ===
